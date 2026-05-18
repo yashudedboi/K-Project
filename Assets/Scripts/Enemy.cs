@@ -1,36 +1,36 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.AI;
 
 
 public class Enemy : MonoBehaviour
 {
-	public bool keyDropped;
-		public int health;
-	[Header("Drop Chance")]
-	public GameObject KeyModel;
+	public int health;
+	[Header("Loot")]
+	public List<LootItem> lootTable = new List<LootItem>();	
 
 	[Header("References")]
-		[SerializeField]
-		private NavMeshAgent navAgent;
-		[SerializeField]
-		private Transform playerTransform;
-		[SerializeField]
-		private Transform firePoint;
-		[SerializeField]
-		private GameObject projectilePrefab;
+	[SerializeField]
+	private NavMeshAgent navAgent;
+	[SerializeField]
+	private Transform playerTransform;
+	[SerializeField]
+	private Transform firePoint;
+	[SerializeField]
+	private GameObject projectilePrefab;
 
 
-		[Header("Layers")]
-		[SerializeField]
-		private LayerMask terrainLayer;
-		[SerializeField]
-		private LayerMask playerLayerMask;
+	[Header("Layers")]
+	[SerializeField]
+	private LayerMask terrainLayer;
+	[SerializeField]
+	private LayerMask playerLayerMask;
 
 
-		[Header("Patrol Settings")]
-		[SerializeField]
-		private float patrolRadius = 10f;
+	[Header("Patrol Settings")]
+	[SerializeField]
+	private float patrolRadius = 10f;
 	private Vector3 currentPatrolPoint;
 	private bool hasPatrolPoint;
 
@@ -49,14 +49,6 @@ public class Enemy : MonoBehaviour
 
 	private bool isPlayerVisible;
 	private bool isPlayerInRange;
-
-
-
-    public void Start()
-    {
-        keyDropped = false;
-    }
-
 
     private void Awake()
 	{
@@ -235,7 +227,22 @@ public class Enemy : MonoBehaviour
     public void Dead()
     {
         Destroy(gameObject);
-		DropKey();
+
+		foreach(LootItem lootItem in lootTable)
+		{
+			if (Random.Range(0,100f) <= lootItem.dropChance)
+			{
+				InstantiateLoot(lootItem.itemPrefab);
+			}
+			break;
+		}
+	}
+	void InstantiateLoot(GameObject loot)
+	{
+		if (loot)
+		{
+			GameObject droppedLoot = Instantiate(loot, transform.position, Quaternion.identity);
+		}
 	}
     public void OnTriggerEnter(Collider collision)
     {
@@ -244,13 +251,5 @@ public class Enemy : MonoBehaviour
             TakeDamage();
         }
     }
-	void DropKey()
-	{
-		Vector3 position = transform.position;
-		GameObject key = Instantiate(KeyModel, position , Quaternion.identity);
-		key.SetActive(true);
-		Destroy(key, 5f);
-		keyDropped = true;
-	}
 
 }

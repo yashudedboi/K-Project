@@ -2,13 +2,12 @@ using UnityEngine;
 
 public class Key : MonoBehaviour
 {
-	public Enemy enemy;
-
-	void Update()
+	public GameObject key;
+	public void OnTriggerEnter(Collider collision)
 	{
-		if (enemy.keyDropped == true)
+		if ((collision.gameObject.CompareTag("Player")))
 		{
-			//Vector3 position = ADD ENEMY POSITION HERE 
+			Destroy(key);
 		}
 	}
 }

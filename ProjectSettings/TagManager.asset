@@ -9,6 +9,8 @@ TagManager:
   - Enviorment
   - Lava
   - Projectile
+  - Key
+  - Exit
   layers:
   - Default
   - TransparentFX

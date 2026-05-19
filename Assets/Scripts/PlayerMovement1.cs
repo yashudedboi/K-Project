@@ -114,8 +114,8 @@ public class PlayerMovement1 : MonoBehaviour
 
     private void Update()
     {
-        //Input
-        MyInput();
+            //Input
+            MyInput();
         //Looking around
         Look();
     }

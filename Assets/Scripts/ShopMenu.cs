@@ -13,6 +13,9 @@ public class ShopMenu : MonoBehaviour
     public GameObject[] gunPrefabs;
     public Transform itemSpawnPoint;
 
+    [Header("References")]
+    public Transform playerReference;
+
     void Start()
     {
         if (shopPanel != null)
@@ -24,18 +27,24 @@ public class ShopMenu : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.X))
-        {
+        {   
             if (shopPanel != null)
             {
-                shopPanel.SetActive(!shopPanel.activeSelf);
+                if (shopPanel.activeSelf) // shop was active
+                {
+                    // close shop
+                    shopPanel.SetActive(false);
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                }
+                else // shop was not open
+                {
+                    // open shop
+                    shopPanel.SetActive(true);
+                    Cursor.lockState = CursorLockMode.Confined;
+                    Cursor.visible = true;
+                }
             }
-        }
-
-        if (shopPanel != null && shopPanel.activeSelf && buttons != null && buttons.Length >= 3)
-        {
-            buttons[0].interactable = coins >= 100;
-            buttons[1].interactable = coins >= 120;
-            buttons[2].interactable = coins >= 200;
         }
     }
 
@@ -47,7 +56,15 @@ public class ShopMenu : MonoBehaviour
     {
         if (gunPrefabs != null && prefabIndex < gunPrefabs.Length && gunPrefabs[prefabIndex] != null && itemSpawnPoint != null)
         {
-            Instantiate(gunPrefabs[prefabIndex], itemSpawnPoint.position, itemSpawnPoint.rotation);
+            // 1. spawn a gun, and get a reference to the newly instantiated object (newGun)
+            GameObject newGun = Instantiate(gunPrefabs[prefabIndex], itemSpawnPoint.position, itemSpawnPoint.rotation);
+
+            // 2. connect references
+            // get the parent's RotateGrapplingGun component, because it has    a reference to the GrapplingGun component/script on the child, which is missing references (player, equipscript, ...)
+            RotateGrapplingGun rgg = newGun.GetComponent<RotateGrapplingGun>();
+
+
+            rgg.grappling.player = playerReference;
         }
     }
 }

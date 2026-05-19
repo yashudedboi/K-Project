@@ -712,12 +712,13 @@ MonoBehaviour:
   - {fileID: 424781975}
   - {fileID: 424781975}
   coinSystem: {fileID: 1600111703}
-  coins: 0
+  coins: 2000
   gunPrefabs:
   - {fileID: 729468751623731702, guid: 072ac2d37a114b04eb09f01ac169fcf5, type: 3}
   - {fileID: 4681174429056018719, guid: a8f197cdb4b300540ac5c221f634b3f2, type: 3}
   - {fileID: 5032220377483895023, guid: 5909b9a06e577df44ae2305ab97cb998, type: 3}
   itemSpawnPoint: {fileID: 1569443509}
+  playerReference: {fileID: 710298938}
 --- !u!1 &153223791
 GameObject:
   m_ObjectHideFlags: 0
@@ -2474,7 +2475,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 34.1, y: 42.1}
+  m_AnchoredPosition: {x: 34.1, y: 35.010178}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &513555673
@@ -10447,7 +10448,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -30.542393}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1600111703

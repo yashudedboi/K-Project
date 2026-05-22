@@ -30,5 +30,7 @@ public class playerhealth : MonoBehaviour
 	{
 		Destroy(gameObject);
 		SceneManager.LoadScene("LoseScreen");
-	}
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
+    }
 }

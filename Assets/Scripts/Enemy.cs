@@ -3,253 +3,220 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.AI;
 
-
 public class Enemy : MonoBehaviour
 {
-	public int health;
-	[Header("Loot")]
-	public List<LootItem> lootTable = new List<LootItem>();	
+    public int health;
+    [Header("Loot")]
+    public List<LootItem> lootTable = new List<LootItem>();
 
-	[Header("References")]
-	[SerializeField]
-	private NavMeshAgent navAgent;
-	[SerializeField]
-	private Transform playerTransform;
-	[SerializeField]
-	private Transform firePoint;
-	[SerializeField]
-	private GameObject projectilePrefab;
+    [Header("References")]
+    [SerializeField] private NavMeshAgent navAgent;
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private GameObject projectilePrefab;
 
+    [Header("Layers")]
+    [SerializeField] private LayerMask terrainLayer;
+    [SerializeField] private LayerMask playerLayerMask;
 
-	[Header("Layers")]
-	[SerializeField]
-	private LayerMask terrainLayer;
-	[SerializeField]
-	private LayerMask playerLayerMask;
+    [Header("Patrol Settings")]
+    [SerializeField] private float patrolRadius = 10f;
+    private Vector3 currentPatrolPoint;
+    private bool hasPatrolPoint;
 
+    [Header("Combat Settings")]
+    [SerializeField] private float attackCooldown = 1f;
+    private bool isOnAttackCooldown;
+    [SerializeField] private float forwardShotForce = 10f;
+    [SerializeField] private float verticalShotForce = 5f;
 
-	[Header("Patrol Settings")]
-	[SerializeField]
-	private float patrolRadius = 10f;
-	private Vector3 currentPatrolPoint;
-	private bool hasPatrolPoint;
+    [Header("Detection Ranges")]
+    [SerializeField] private float visionRange = 20f;
+    [SerializeField] private float engagementRange = 10f;
 
-
-	[Header("Combat Settings")]
-	[SerializeField] private float attackCooldown = 1f;
-	private bool isOnAttackCooldown;
-	[SerializeField] private float forwardShotForce = 10f;
-	[SerializeField] private float verticalShotForce = 5f;
-
-
-	[Header("Detection Ranges")]
-	[SerializeField] private float visionRange = 20f;
-	[SerializeField] private float engagementRange = 10f;
-
-
-	private bool isPlayerVisible;
-	private bool isPlayerInRange;
+    private bool isPlayerVisible;
+    private bool isPlayerInRange;
 
     private void Awake()
-	{
-		if (playerTransform == null)
-		{
-			GameObject playerObj = GameObject.Find("Player");
-			if (playerObj != null)
-			{
-				playerTransform = playerObj.transform;
-			}
-		}
+    {
+        // 1. Force the game time to be normal speed
+        Time.timeScale = 1f;
 
-
-		if (navAgent == null)
-		{
-			navAgent = GetComponent<NavMeshAgent>();
-		}
-	}
-
-
-	private void Update()
-	{
-		DetectPlayer();
-		UpdateBehaviourState();
-	}
-
-
-	private void OnDrawGizmosSelected()
-	{
-		Gizmos.color = Color.red;
-		Gizmos.DrawWireSphere(transform.position, engagementRange);
-
-
-		Gizmos.color = Color.yellow;
-		Gizmos.DrawWireSphere(transform.position, visionRange);
-	}
-
-
-	private void DetectPlayer()
-	{
-		isPlayerVisible = Physics.CheckSphere(transform.position, visionRange, playerLayerMask);
-		isPlayerInRange = Physics.CheckSphere(transform.position, engagementRange, playerLayerMask);
-	}
-
-
-	private void FireProjectile()
-	{
-		if (projectilePrefab == null || firePoint == null) return;
-
-
-		Rigidbody projectileRb = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity).GetComponent<Rigidbody>();
-		projectileRb.AddForce(transform.forward * forwardShotForce, ForceMode.Impulse);
-		projectileRb.AddForce(transform.up * verticalShotForce, ForceMode.Impulse);
-
-
-		Destroy(projectileRb.gameObject, 3f);
-	}
-
-
-	private void FindPatrolPoint()
-	{
-		float randomX = Random.Range(-patrolRadius, patrolRadius);
-		float randomZ = Random.Range(-patrolRadius, patrolRadius);
-
-
-		Vector3 potentialPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-
-
-		if (Physics.Raycast(potentialPoint, -transform.up, 2f, terrainLayer))
-		{
-			currentPatrolPoint = potentialPoint;
-			hasPatrolPoint = true;
-		}
-	}
-
-
-	private IEnumerator AttackCooldownRoutine()
-	{
-		isOnAttackCooldown = true;
-		yield return new WaitForSeconds(attackCooldown);
-		isOnAttackCooldown = false;
-	}
-
-
-
-
-	private void PerformPatrol()
-	{
-		if (!hasPatrolPoint)
-			FindPatrolPoint();
-
-
-		if (hasPatrolPoint)
-			navAgent.SetDestination(currentPatrolPoint);
-
-
-		if (Vector3.Distance(transform.position, currentPatrolPoint) < 1f)
-			hasPatrolPoint = false;
-	}
-
-
-	private void PerformChase()
-	{
-		if (playerTransform != null)
-		{
-			navAgent.SetDestination(playerTransform.position);
-		}
-	}
-
-
-	private void PerformAttack()
-	{
-		navAgent.SetDestination(transform.position);
-
-
-		if (playerTransform != null)
-		{
-			transform.LookAt(playerTransform);
-		}
-
-
-		if (!isOnAttackCooldown)
-		{
-			FireProjectile();
-			StartCoroutine(AttackCooldownRoutine());
-		}
-	}
-
-
-	private void UpdateBehaviourState()
-	{
-		if (!isPlayerVisible && !isPlayerInRange)
-		{
-			PerformPatrol();
-		}
-		else if (isPlayerVisible && !isPlayerInRange)
-		{
-			PerformChase();
-		}
-		else if (isPlayerVisible && isPlayerInRange)
-		{
-			PerformAttack();
-		}
-	}
-
-
-
-    /*public NavMeshAgent agent;
-        public Transform player;
-        public LayerMask whatIsGround, whatIsPlayer;
-
-        //Patrolling or Looking for player
-        public Vector3 walkPoint;
-        bool walkPointSet;
-        public float walkPointRange;
-
-        //Attaking
-        public float timeBetweenAttacks;
-        bool alreadyAttacked;
-
-        //states
-        public float sightRange, attackRange;
-        public bool playerInSightRange, playerInAttackRange;
-        private void Awake()
+        // 2. Find the player
+        if (playerTransform == null)
         {
+            GameObject playerObj = GameObject.Find("Player");
+            if (playerObj != null) playerTransform = playerObj.transform;
+        }
 
-        }*/
+        // 3. Completely nuke any broken agent component leftover from the scene load
+        NavMeshAgent oldAgent = GetComponent<NavMeshAgent>();
+        if (oldAgent != null)
+        {
+            DestroyImmediate(oldAgent);
+        }
+    }
+
+    private IEnumerator Start()
+    {
+        // 4. Wait 1 frame for Level 2 to completely settle down
+        yield return null;
+
+        // 5. Build a brand new, clean NavMeshAgent out of thin air!
+        navAgent = gameObject.AddComponent<NavMeshAgent>();
+
+        // 6. OPTIONAL: If your enemy had custom settings, set them here:
+        // navAgent.speed = 3.5f;
+        // navAgent.stoppingDistance = 1f;
+    }
+
+    private void Update()
+    {
+        DetectPlayer();
+        UpdateBehaviourState();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, engagementRange);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, visionRange);
+    }
+
+    private void DetectPlayer()
+    {
+        isPlayerVisible = Physics.CheckSphere(transform.position, visionRange, playerLayerMask);
+        isPlayerInRange = Physics.CheckSphere(transform.position, engagementRange, playerLayerMask);
+    }
+
+    private void FireProjectile()
+    {
+        if (projectilePrefab == null || firePoint == null) return;
+
+        Rigidbody projectileRb = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity).GetComponent<Rigidbody>();
+        projectileRb.AddForce(transform.forward * forwardShotForce, ForceMode.Impulse);
+        projectileRb.AddForce(transform.up * verticalShotForce, ForceMode.Impulse);
+
+        Destroy(projectileRb.gameObject, 3f);
+    }
+
+    private void FindPatrolPoint()
+    {
+        float randomX = Random.Range(-patrolRadius, patrolRadius);
+        float randomZ = Random.Range(-patrolRadius, patrolRadius);
+
+        Vector3 potentialPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
+
+        if (Physics.Raycast(potentialPoint, -transform.up, 2f, terrainLayer))
+        {
+            currentPatrolPoint = potentialPoint;
+            hasPatrolPoint = true;
+        }
+    }
+
+    private IEnumerator AttackCooldownRoutine()
+    {
+        isOnAttackCooldown = true;
+        yield return new WaitForSeconds(attackCooldown);
+        isOnAttackCooldown = false;
+    }
+
+    private void PerformPatrol()
+    {
+        if (!hasPatrolPoint)
+            FindPatrolPoint();
+
+        if (hasPatrolPoint)
+            navAgent.SetDestination(currentPatrolPoint);
+
+        if (Vector3.Distance(transform.position, currentPatrolPoint) < 1f)
+            hasPatrolPoint = false;
+    }
+
+    private void PerformChase()
+    {
+        if (playerTransform != null)
+        {
+            navAgent.SetDestination(playerTransform.position);
+        }
+    }
+
+    private void PerformAttack()
+    {
+        navAgent.SetDestination(transform.position);
+
+        if (playerTransform != null)
+        {
+            transform.LookAt(playerTransform);
+        }
+
+        if (!isOnAttackCooldown)
+        {
+            FireProjectile();
+            StartCoroutine(AttackCooldownRoutine());
+        }
+    }
+
+    private void UpdateBehaviourState()
+    {
+        // FIX: Safety check to prevent errors during scene initialization frames
+        if (navAgent == null || !navAgent.isActiveAndEnabled || !navAgent.isOnNavMesh)
+        {
+            return;
+        }
+
+        if (!isPlayerVisible && !isPlayerInRange)
+        {
+            PerformPatrol();
+        }
+        else if (isPlayerVisible && !isPlayerInRange)
+        {
+            PerformChase();
+        }
+        else if (isPlayerVisible && isPlayerInRange)
+        {
+            PerformAttack();
+        }
+    }
+
     void TakeDamage()
     {
         health -= 50;
-        if (health < 0 )
+        if (health < 0)
         {
             Dead();
         }
     }
+
     public void Dead()
     {
         Destroy(gameObject);
 
-		foreach(LootItem lootItem in lootTable)
-		{
-			if (Random.Range(0,100f) <= lootItem.dropChance)
-			{
-				InstantiateLoot(lootItem.itemPrefab);
-			}
-			break;
-		}
-	}
-	void InstantiateLoot(GameObject loot)
-	{
-		if (loot)
-		{
-			GameObject droppedLoot = Instantiate(loot, transform.position, Quaternion.identity);
-		}
-	}
+        foreach (LootItem lootItem in lootTable)
+        {
+            if (Random.Range(0, 100f) <= lootItem.dropChance)
+            {
+                InstantiateLoot(lootItem.itemPrefab);
+            }
+            break;
+        }
+    }
+
+    void InstantiateLoot(GameObject loot)
+    {
+        if (loot)
+        {
+            GameObject droppedLoot = Instantiate(loot, transform.position, Quaternion.identity);
+        }
+    }
+
     public void OnTriggerEnter(Collider collision)
     {
-        if ((collision.gameObject.CompareTag("Bullet")))
+        if (collision.gameObject.CompareTag("Bullet"))
         {
             TakeDamage();
         }
     }
-
 }

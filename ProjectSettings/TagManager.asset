@@ -11,6 +11,7 @@ TagManager:
   - Projectile
   - Key
   - Exit
+  - SpeedBoost
   layers:
   - Default
   - TransparentFX

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayerMovement1 : MonoBehaviour
 {
+    [Header("SpeedBoost")]
+    public GameObject speedBoost;
     [Header("Assignables")]
     //Assignables
     public Transform playerCam;
@@ -114,8 +116,8 @@ public class PlayerMovement1 : MonoBehaviour
 
     private void Update()
     {
-            //Input
-            MyInput();
+        //Input
+        MyInput();
         //Looking around
         Look();
     }
@@ -381,6 +383,7 @@ public class PlayerMovement1 : MonoBehaviour
         }
     }
 
+
     private bool IsFloor(Vector3 v)
     {
         return Vector3.Angle(Vector3.up, v) < maxSlopeAngle;
@@ -519,5 +522,18 @@ public class PlayerMovement1 : MonoBehaviour
     public Rigidbody GetRb()
     {
         return rb;
+    }
+    public void SpeedBoost()
+    {
+        moveSpeed += 8000f;
+    }
+    public void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("SpeedBoost"))
+        {
+            Destroy(speedBoost);
+            SpeedBoost();
+        }
+
     }
 }

@@ -945,7 +945,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 58016da490b155d408d32c41d33cfac2, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: cc94197374795e34aa3d881417099cca, type: 2}
   m_BuildHeightMesh: 0
 --- !u!64 &69825168
 MeshCollider:
@@ -1389,13 +1389,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 068989a9213ceee4692af136e18c4c9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Enemy: {fileID: 0}
   shopPanel: {fileID: 523695773}
   buttons:
   - {fileID: 790024176}
   - {fileID: 424781975}
   - {fileID: 424781975}
   coinSystem: {fileID: 1600111703}
-  coins: 2000
+  coins: 0
   gunPrefabs:
   - {fileID: 6497970983403064026, guid: 3fd28ce5b02b8394db18ee4b6c7276a7, type: 3}
   - {fileID: 3056407011945770293, guid: c817941ea2d1bc14db27dfd2171a5b9e, type: 3}
@@ -3369,7 +3370,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Next Level
+  m_text: 'Retry Level
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9637,6 +9640,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d538cb51e07cb74a8d5964e955be831, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speedBoost: {fileID: 0}
   playerCam: {fileID: 402173271}
   orientation: {fileID: 1177561929}
   rb: {fileID: 710298934}
@@ -9685,6 +9689,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 100
+  isPlayerDead: 0
 --- !u!114 &710298942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9698,7 +9703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsKeyEquipped: 0
-  uiManager: {fileID: 1365764434}
+  uiManager: {fileID: 1760527805}
 --- !u!1 &770439088
 GameObject:
   m_ObjectHideFlags: 0
@@ -10079,7 +10084,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &805541333
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10116,6 +10121,7 @@ MonoBehaviour:
   gameplayPanel: {fileID: 897023919}
   winPanel: {fileID: 805541332}
   losePanel: {fileID: 1760527803}
+  playerhealth: {fileID: 710298941}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -13341,6 +13347,7 @@ MonoBehaviour:
   gameplayPanel: {fileID: 897023919}
   winPanel: {fileID: 805541332}
   losePanel: {fileID: 1760527803}
+  playerhealth: {fileID: 710298941}
 --- !u!1 &1435962784
 GameObject:
   m_ObjectHideFlags: 0
@@ -14502,8 +14509,8 @@ ReflectionProbe:
   m_TimeSlicingMode: 2
   m_Resolution: 2048
   m_UpdateFrequency: 0
-  m_BoxSize: {x: 146.27919, y: 26.36534, z: 26.63338}
-  m_BoxOffset: {x: 39.173347, y: 8.18267, z: -0.24257469}
+  m_BoxSize: {x: 384.27917, y: 26.36534, z: 26.63338}
+  m_BoxOffset: {x: 41.173355, y: 8.18267, z: -0.24257469}
   m_NearClip: 0.3
   m_FarClip: 1000
   m_ShadowDistance: 100
@@ -14905,7 +14912,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1760527804
 RectTransform:
   m_ObjectHideFlags: 0
@@ -14942,6 +14949,7 @@ MonoBehaviour:
   gameplayPanel: {fileID: 897023919}
   winPanel: {fileID: 805541332}
   losePanel: {fileID: 1760527803}
+  playerhealth: {fileID: 710298941}
 --- !u!1 &1800120161
 GameObject:
   m_ObjectHideFlags: 0
@@ -16904,6 +16912,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 100
+  isEnemyDead: 0
   lootTable:
   - itemPrefab: {fileID: 770439088}
     dropChance: 100

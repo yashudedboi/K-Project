@@ -7,6 +7,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject gameplayPanel;
     [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject losePanel; // 1. Added lose panel reference
+    public playerhealth playerhealth;
 
     void Start()
     {
@@ -18,12 +19,21 @@ public class UIManager : MonoBehaviour
         winPanel.SetActive(false);
         losePanel.SetActive(false); // 2. Hide lose panel at start
     }
+    public void Update()
+    {
+        if (playerhealth.isPlayerDead == true)   
+        {
+            ShowLoseScreen();
+        }
+    }
 
     // Call this method when the player wins
     public void ShowWinScreen()
     {
         gameplayPanel.SetActive(false);
         winPanel.SetActive(true);
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
     }
 
     // 3. New method: Call this when the player loses (e.g., hits an enemy, falls in a pit)
@@ -31,7 +41,8 @@ public class UIManager : MonoBehaviour
     {
         gameplayPanel.SetActive(false);
         losePanel.SetActive(true);
-       
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
     }
 
     // 4. Handy shortcut for a "Retry" button on your lose screen

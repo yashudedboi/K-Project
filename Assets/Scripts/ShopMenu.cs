@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 public class ShopMenu : MonoBehaviour
 {
+    [Header("EnemyScripttoGainCoins")]
+    public Enemy Enemy; 
+
     [Header("UI Elements")]
     public GameObject shopPanel;
     public Button[] buttons;
@@ -47,6 +50,11 @@ public class ShopMenu : MonoBehaviour
                 }
             }
         }
+    }
+    public void AddCoins(int amount)
+    {
+        coins += amount;
+        coinSystem.UpdateCoinDisplay(coins);
     }
 
     public void BuyShotGun()

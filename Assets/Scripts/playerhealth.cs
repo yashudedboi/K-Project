@@ -4,9 +4,14 @@ using UnityEngine.SceneManagement;
 public class playerhealth : MonoBehaviour
 {
 	public int health;
+	public bool isPlayerDead;
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
-	private void OnTriggerEnter(Collider collision)
+	public void Start()
+	{
+		isPlayerDead = false;
+	}
+    private void OnTriggerEnter(Collider collision)
 	{
 		if (collision.gameObject.CompareTag("Lava"))
 		{
@@ -28,8 +33,9 @@ public class playerhealth : MonoBehaviour
 	}
 	void playerDied()
 	{
+		isPlayerDead =true;
+		Debug.Log("showinglosescreen");
 		Destroy(gameObject);
-		SceneManager.LoadScene("LoseScreen");
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = true;
     }

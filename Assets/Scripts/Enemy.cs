@@ -6,6 +6,7 @@ using UnityEngine.AI;
 public class Enemy : MonoBehaviour
 {
     public int health;
+    public bool isEnemyDead;
     [Header("Loot")]
     public List<LootItem> lootTable = new List<LootItem>();
 
@@ -39,35 +40,18 @@ public class Enemy : MonoBehaviour
 
     private void Awake()
     {
-        // 1. Force the game time to be normal speed
+        isEnemyDead = false;
         Time.timeScale = 1f;
 
-        // 2. Find the player
+        navAgent = GetComponent<NavMeshAgent>();
+
         if (playerTransform == null)
         {
             GameObject playerObj = GameObject.Find("Player");
-            if (playerObj != null) playerTransform = playerObj.transform;
+
+            if (playerObj != null)
+                playerTransform = playerObj.transform;
         }
-
-        // 3. Completely nuke any broken agent component leftover from the scene load
-        NavMeshAgent oldAgent = GetComponent<NavMeshAgent>();
-        if (oldAgent != null)
-        {
-            DestroyImmediate(oldAgent);
-        }
-    }
-
-    private IEnumerator Start()
-    {
-        // 4. Wait 1 frame for Level 2 to completely settle down
-        yield return null;
-
-        // 5. Build a brand new, clean NavMeshAgent out of thin air!
-        navAgent = gameObject.AddComponent<NavMeshAgent>();
-
-        // 6. OPTIONAL: If your enemy had custom settings, set them here:
-        // navAgent.speed = 3.5f;
-        // navAgent.stoppingDistance = 1f;
     }
 
     private void Update()
@@ -192,7 +176,12 @@ public class Enemy : MonoBehaviour
 
     public void Dead()
     {
-        Destroy(gameObject);
+        ShopMenu shop = FindObjectOfType<ShopMenu>();
+
+        if (shop != null)
+        {
+            shop.AddCoins(1000);
+        }
 
         foreach (LootItem lootItem in lootTable)
         {
@@ -202,7 +191,10 @@ public class Enemy : MonoBehaviour
             }
             break;
         }
+
+        Destroy(gameObject);
     }
+
 
     void InstantiateLoot(GameObject loot)
     {

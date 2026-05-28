@@ -6,6 +6,7 @@ public class UIManager : MonoBehaviour
     // Reference to your UI panels
     [SerializeField] private GameObject gameplayPanel;
     [SerializeField] private GameObject winPanel;
+    [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject losePanel; // 1. Added lose panel reference
     public playerhealth playerhealth;
 
@@ -21,10 +22,23 @@ public class UIManager : MonoBehaviour
     }
     public void Update()
     {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            ShowPauseScreen();
+            Time.timeScale = 0f;
+        }
+
         if (playerhealth.isPlayerDead == true)   
         {
             ShowLoseScreen();
         }
+    }
+    public void ShowPauseScreen()
+    {
+        gameplayPanel.SetActive(false);
+        pausePanel.SetActive(true);
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
     }
 
     // Call this method when the player wins
@@ -65,5 +79,17 @@ public class UIManager : MonoBehaviour
     public void NextLevel3()
     {
         SceneManager.LoadScene("Level 3");
+    }
+    public void ResumeButton()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        gameplayPanel.SetActive(true);
+        pausePanel.SetActive(false);
+        Time.timeScale = 1f;
+    }
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }

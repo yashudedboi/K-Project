@@ -1,15 +1,19 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class playerhealth : MonoBehaviour
 {
 	public int health;
 	public bool isPlayerDead;
-
+	public Slider healthSlider;
+	
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	public void Start()
 	{
 		isPlayerDead = false;
+		healthSlider.maxValue = health;
+		healthSlider.value = health;
 	}
     private void OnTriggerEnter(Collider collision)
 	{
@@ -22,7 +26,8 @@ public class playerhealth : MonoBehaviour
 		{
 			if (health > 0 && health !=0)
 			{
-				health -= 10;
+                healthSlider.value = health;
+                health -= 10;
 			}
 			else
 			{

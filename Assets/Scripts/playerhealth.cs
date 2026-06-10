@@ -38,10 +38,6 @@ public class playerhealth : MonoBehaviour
 	}
 	void playerDied()
 	{
-		isPlayerDead =true;
-		Debug.Log("showinglosescreen");
-		Destroy(gameObject);
-        Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = true;
+		isPlayerDead = true;
     }
 }

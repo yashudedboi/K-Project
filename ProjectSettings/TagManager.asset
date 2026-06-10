@@ -12,6 +12,7 @@ TagManager:
   - Key
   - Exit
   - SpeedBoost
+  - CheckPoint
   layers:
   - Default
   - TransparentFX

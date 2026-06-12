@@ -1,15 +1,20 @@
 using UnityEngine;
-using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class CheckPoint : MonoBehaviour
 {
     [SerializeField] GameObject player;
-    [SerializeField] List<GameObject> checkPoints;
     [SerializeField] Vector3 vectorPoint;
+
+    [Header("Spawn Settings")]
+    // This will lift the player up on the Y axis so they don't spawn inside the box
+    [SerializeField] Vector3 spawnOffset = new Vector3(0, 1.5f, 0);
+
     public int health = 100;
     public bool isPlayerDead;
     public Slider healthSlider;
+
+    private Rigidbody playerRb;
 
     public void Start()
     {
@@ -19,43 +24,62 @@ public class CheckPoint : MonoBehaviour
             healthSlider.maxValue = health;
             healthSlider.value = health;
         }
-        // Set the initial spawn point so vectorPoint isn't (0,0,0) at the start
         vectorPoint = player.transform.position;
+        playerRb = player.GetComponent<Rigidbody>();
     }
 
     void Update()
     {
         if (isPlayerDead)
         {
-            player.transform.position = vectorPoint;
+            // Teleport to the checkpoint PLUS the safety offset
+            player.transform.position = vectorPoint + spawnOffset;
+
+            if (playerRb != null)
+            {
+                playerRb.linearVelocity = Vector3.zero; // Use playerRb.velocity on older Unity versions
+                playerRb.angularVelocity = Vector3.zero;
+            }
+
             health = 100;
             if (healthSlider != null) healthSlider.value = health;
 
-            isPlayerDead = false; // CRITICAL: Reset this so you can move again!
+            isPlayerDead = false;
         }
     }
 
-    // Use FixedUpdate or OnTriggerEnter for Trigger objects (like Checkpoints or phantom Lava)
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("CheckPoint"))
         {
-            vectorPoint = other.transform.position; // Save the checkpoint's position, not the player's current position
+            // Save the base position of the checkpoint box
+            vectorPoint = other.transform.position;
+            Debug.Log("Checkpoint Saved!");
         }
-        else if (other.gameObject.CompareTag("Lava"))
+
+        if (other.gameObject.CompareTag("Lava"))
         {
             PlayerDied();
-            Debug.Log("You Died in Lava!");
         }
     }
 
-    // Use OnCollisionEnter for solid objects (like physical Projectiles)
     private void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.CompareTag("CheckPoint"))
+        {
+            // Save the base position of the checkpoint box
+            vectorPoint = collision.transform.position;
+            Debug.Log("Checkpoint Saved!");
+        }
+
+        if (collision.gameObject.CompareTag("Lava"))
+        {
+            PlayerDied();
+        }
+
         if (collision.gameObject.CompareTag("Projectile"))
         {
-            Destroy(collision.gameObject); // Destroy the projectile that hit you
-
+            Destroy(collision.gameObject);
             if (health > 10)
             {
                 health -= 10;

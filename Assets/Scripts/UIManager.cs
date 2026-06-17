@@ -52,8 +52,25 @@ public class UIManager : MonoBehaviour
         pausePanel.SetActive(false);
         Time.timeScale = 1f;
     }
+    public void MainMenu()
+    {
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
+        SceneManager.LoadScene("MainMenu");
+    }
+    public void Credits()
+    {
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
+        SceneManager.LoadScene("Credits");
+    }
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public void HowToPlay()
+    {
+        SceneManager.LoadScene("How to play");
     }
 }

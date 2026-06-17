@@ -1,7 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
 
-// This guarantees an AudioSource will always exist on this GameObject
 [RequireComponent(typeof(AudioSource))]
 public class CheckPoint : MonoBehaviour
 {
@@ -11,52 +9,47 @@ public class CheckPoint : MonoBehaviour
     [Header("Spawn Settings")]
     [SerializeField] Vector3 spawnOffset = new Vector3(0, 1.5f, 0);
 
-    public int health = 100;
-    public bool isPlayerDead;
-    public Slider healthSlider;
-
     private Rigidbody playerRb;
+    private playerhealth playerHealthScript; // Reference to the health script
 
-    private AudioSource soundPlayer; // Made private since we get it automatically
+    private AudioSource soundPlayer;
     public AudioClip Level1;
     public AudioClip Level2;
     public AudioClip Level3;
 
     public void Start()
     {
-        // FIX: Correctly assign the AudioSource component to the variable
         soundPlayer = GetComponent<AudioSource>();
-
-        isPlayerDead = false;
-        if (healthSlider != null)
-        {
-            healthSlider.maxValue = health;
-            healthSlider.value = health;
-        }
 
         if (player != null)
         {
             vectorPoint = player.transform.position;
             playerRb = player.GetComponent<Rigidbody>();
+            playerHealthScript = player.GetComponent<playerhealth>();
         }
     }
 
     void Update()
     {
-        if (isPlayerDead)
+        if (playerHealthScript != null && playerHealthScript.isPlayerDead)
         {
+            // 1. Teleport
             player.transform.position = vectorPoint + spawnOffset;
 
+            // 2. FORCE physics to acknowledge the new position immediately
+            Physics.SyncTransforms();
+
+            // 3. Reset Physics
             if (playerRb != null)
             {
                 playerRb.linearVelocity = Vector3.zero;
                 playerRb.angularVelocity = Vector3.zero;
+                playerRb.WakeUp();
             }
 
-            health = 100;
-            if (healthSlider != null) healthSlider.value = health;
-
-            isPlayerDead = false;
+            // 4. Reset health
+            playerHealthScript.ResetHealth();
+            Debug.Log("Teleport and Reset complete!");
         }
     }
 
@@ -65,35 +58,34 @@ public class CheckPoint : MonoBehaviour
         if (other.gameObject.CompareTag("CheckPoint1"))
         {
             vectorPoint = other.transform.position;
-            soundPlayer.clip = Level1;
-            soundPlayer.Play();
-            Debug.Log("Checkpoint Saved!");
+            PlaySound(Level1);
         }
-
-        if (other.gameObject.CompareTag("CheckPoint2"))
+        else if (other.gameObject.CompareTag("CheckPoint2"))
         {
             vectorPoint = other.transform.position;
-            soundPlayer.clip = Level2;
-            soundPlayer.Play();
-            Debug.Log("Checkpoint Saved!");
+            PlaySound(Level2);
         }
-
-        if (other.gameObject.CompareTag("CheckPoint3"))
+        else if (other.gameObject.CompareTag("CheckPoint3"))
         {
             vectorPoint = other.transform.position;
-            soundPlayer.clip = Level3;
-            soundPlayer.Play();
-            Debug.Log("Checkpoint Saved!");
+            PlaySound(Level3);
         }
-
-        if (other.gameObject.CompareTag("Lava"))
+        else if (other.gameObject.CompareTag("Lava"))
         {
-            PlayerDied();
+            if (playerHealthScript != null)
+            {
+                playerHealthScript.isPlayerDead = true;
+            }
         }
     }
 
-    void PlayerDied()
+    void PlaySound(AudioClip clip)
     {
-        isPlayerDead = true;
+        if (soundPlayer != null && clip != null)
+        {
+            soundPlayer.clip = clip;
+            soundPlayer.Play();
+            Debug.Log("Checkpoint Saved!");
+        }
     }
 }

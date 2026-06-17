@@ -1,13 +1,16 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Key : MonoBehaviour
 {
-	public GameObject key;
-	public void OnTriggerEnter(Collider collision)
+	public void OnCollisionEnter(Collision collision)
 	{
-		if ((collision.gameObject.CompareTag("Player")))
+		if ((collision.gameObject.CompareTag("Exit")))
 		{
-			Destroy(key);
+            Cursor.lockState = CursorLockMode.Confined;
+			Cursor.visible = true;
+
+            SceneManager.LoadScene("End");
 		}
 	}
 }

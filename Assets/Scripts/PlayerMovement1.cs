@@ -3,10 +3,20 @@ using UnityEngine;
 
 public class PlayerMovement1 : MonoBehaviour
 {
+    [Header("Audio Settings")]
+    public AudioSource audioSource;
+    public AudioClip footstepSound;
+    public AudioClip jumpSound;
+    [Tooltip("Time between footsteps when walking")]
+    public float walkStepInterval = 0.45f;
+    [Tooltip("Time between footsteps when running")]
+    public float runStepInterval = 0.3f;
+
+    private float footstepTimer;
+
     [Header("SpeedBoost")]
     public GameObject speedBoost;
     [Header("Assignables")]
-    //Assignables
     public Transform playerCam;
     public Transform orientation;
     private Collider playerCollider;
@@ -87,6 +97,12 @@ public class PlayerMovement1 : MonoBehaviour
         Cursor.visible = false;
         readyToJump = true;
         wallNormalVector = Vector3.up;
+
+        // Auto-assign AudioSource if forgot to assign in Inspector
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
 
     private void LateUpdate()
@@ -120,6 +136,8 @@ public class PlayerMovement1 : MonoBehaviour
         MyInput();
         //Looking around
         Look();
+        //Handle footstep audio looping
+        HandleFootsteps();
     }
 
     //Player input
@@ -221,6 +239,43 @@ public class PlayerMovement1 : MonoBehaviour
         rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * num4);
     }
 
+    // New method to process repeating footstep sounds
+    private void HandleFootsteps()
+    {
+        // Don't play steps if we aren't on the ground, or if we aren't providing movement inputs
+        if (!grounded || (Mathf.Abs(x) < 0.1f && Mathf.Abs(y) < 0.1f) || rb.linearVelocity.magnitude < 0.5f)
+        {
+            // Resetting timer to 0 ensures footsteps play instantly the moment you start moving again
+            footstepTimer = 0f;
+            return;
+        }
+
+        footstepTimer -= Time.deltaTime;
+
+        if (footstepTimer <= 0f)
+        {
+            // Calculate current horizontal velocity (ignoring Y axis shifts)
+            float horizontalSpeed = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude;
+
+            // Dynamically alter step rates based on how fast the player is actually traveling
+            // (Since walkSpeed is set high at 20f, we split the threshold around 12f)
+            float currentInterval = (horizontalSpeed > 12f) ? runStepInterval : walkStepInterval;
+
+            // Slow down footsteps down slightly if crouching/sliding
+            if (crouching)
+            {
+                currentInterval = walkStepInterval * 1.5f;
+            }
+
+            if (audioSource != null && footstepSound != null)
+            {
+                audioSource.PlayOneShot(footstepSound);
+            }
+
+            footstepTimer = currentInterval;
+        }
+    }
+
     //Ready to jump again
     private void ResetJump()
     {
@@ -233,6 +288,13 @@ public class PlayerMovement1 : MonoBehaviour
         if ((grounded || wallRunning || surfing) && readyToJump)
         {
             MonoBehaviour.print("jumping");
+
+            // Play Jump Sound
+            if (audioSource != null && jumpSound != null)
+            {
+                audioSource.PlayOneShot(jumpSound);
+            }
+
             Vector3 velocity = rb.linearVelocity;
             readyToJump = false;
             rb.AddForce(Vector2.up * jumpForce * 1.5f);
